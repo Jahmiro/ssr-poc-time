@@ -1,7 +1,7 @@
 // pages/blogs.tsx
 
 import Navigation from "@/components/navigation";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import Link from "next/link";
 
 type Blog = {
@@ -29,11 +29,8 @@ const BlogsPage = ({ blogs }: Props) => {
           </div>
           <div className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
             {blogs.map((blog) => (
-              <Link href={`/blogs/${blog.id}`}>
-                <article
-                  key={blog.id}
-                  className="flex max-w-xl flex-col items-start justify-between border rounded-lg overflow-hidden"
-                >
+              <Link key={blog.id} href={`/blogs/${blog.id}`}>
+                <article className="flex max-w-xl flex-col items-start justify-between border rounded-lg overflow-hidden hover:shadow-lg transition duration-300 ease-in-out">
                   <div className="group relative p-6">
                     <h3 className="mt-3 text-lg font-semibold leading-6 text-tertiary-800 group-hover:text-gray-600">
                       {blog.title}
@@ -52,7 +49,7 @@ const BlogsPage = ({ blogs }: Props) => {
   );
 };
 
-export const getStaticProps: GetStaticProps<Props> = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
     const res = await fetch(`${BASE_URL}/blog-posts`);
     if (!res.ok) {

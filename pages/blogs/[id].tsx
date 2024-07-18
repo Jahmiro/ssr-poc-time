@@ -1,7 +1,7 @@
 // pages/blogs/[id].tsx
 
 import Navigation from "@/components/navigation";
-import { GetStaticProps, GetStaticPaths } from "next";
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import React from "react";
 
@@ -16,54 +16,7 @@ type Props = {
   error: string | null;
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  try {
-    const res = await fetch(
-      `https://cryptic-bastion-20850-17d5b5f8ec19.herokuapp.com/blog-posts`
-    );
-    if (!res.ok) {
-      throw new Error("Failed to fetch blog posts");
-    }
-    const data: Blog[] = await res.json();
-
-    const paths = data.map((blog) => ({
-      params: { id: blog.id.toString() },
-    }));
-
-    return { paths, fallback: true };
-  } catch (error) {
-    console.error("Error fetching blog paths:", error);
-    return { paths: [], fallback: true };
-  }
-};
-
-export const getStaticProps: GetStaticProps<Props> = async (context) => {
-  const { id } = context.params!;
-  try {
-    const res = await fetch(
-      `https://cryptic-bastion-20850-17d5b5f8ec19.herokuapp.com/blog-posts/${id}`
-    );
-    if (!res.ok) {
-      throw new Error(`Failed to fetch blog with id ${id}: ${res.statusText}`);
-    }
-    const blog: Blog = await res.json();
-
-    return {
-      props: {
-        blog,
-        error: null,
-      },
-    };
-  } catch (error) {
-    console.error(`Error fetching blog with id ${id}:`, error);
-    return {
-      props: {
-        blog: null,
-        error: `Failed to fetch blog with id ${id}`,
-      },
-    };
-  }
-};
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const BlogDetail: React.FC<Props> = ({ blog, error }) => {
   const router = useRouter();
@@ -111,6 +64,32 @@ const BlogDetail: React.FC<Props> = ({ blog, error }) => {
       </div>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
+  const { id } = context.params!;
+  try {
+    const res = await fetch(`${BASE_URL}/blog-posts/${id}`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch blog with id ${id}: ${res.statusText}`);
+    }
+    const blog: Blog = await res.json();
+
+    return {
+      props: {
+        blog,
+        error: null,
+      },
+    };
+  } catch (error) {
+    console.error(`Error fetching blog with id ${id}:`, error);
+    return {
+      props: {
+        blog: null,
+        error: `Failed to fetch blog with id ${id}`,
+      },
+    };
+  }
 };
 
 export default BlogDetail;
