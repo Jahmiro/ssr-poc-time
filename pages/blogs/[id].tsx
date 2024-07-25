@@ -71,6 +71,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
   try {
     const res = await fetch(`${BASE_URL}/blog-posts/${id}`);
     if (!res.ok) {
+      if (res.status === 404) {
+        return {
+          notFound: true,
+        };
+      }
       throw new Error(`Failed to fetch blog with id ${id}: ${res.statusText}`);
     }
     const blog: Blog = await res.json();
