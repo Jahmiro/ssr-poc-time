@@ -13,12 +13,11 @@ type Blog = {
 
 type Props = {
   blog: Blog | null;
-  error: string | null;
 };
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const BlogDetail: React.FC<Props> = ({ blog, error }) => {
+const BlogDetail: React.FC<Props> = ({ blog }) => {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -27,10 +26,6 @@ const BlogDetail: React.FC<Props> = ({ blog, error }) => {
         <p>Loading...</p>
       </div>
     );
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
   }
 
   if (!blog) {
@@ -80,19 +75,22 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
     }
     const blog: Blog = await res.json();
 
+    // If the blog is null or undefined, return notFound: true
+    if (!blog) {
+      return {
+        notFound: true,
+      };
+    }
+
     return {
       props: {
         blog,
-        error: null,
       },
     };
   } catch (error) {
     console.error(`Error fetching blog with id ${id}:`, error);
     return {
-      props: {
-        blog: null,
-        error: `Failed to fetch blog with id ${id}`,
-      },
+      notFound: true,
     };
   }
 };
