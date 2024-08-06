@@ -28,5 +28,3 @@ Om ssr te testen:
 1. Maak een nieuwe blogpost aan via https://ssr-poc-time.vercel.app.
 
 2. Vervolgens zie je dat de blogs gelijk geüpdate worden.
-
-   Dit verzoek zal de pagina met het pad `/blogs` opnieuw genereren.
